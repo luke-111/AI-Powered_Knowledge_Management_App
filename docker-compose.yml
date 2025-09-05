@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: notes
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data
+    
+  backend:
+    build: ./backend
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASS: postgres
+      DB_NAME: notes
+      PRIVATE_KEY: thisIsASecretKey
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+    depends_on:
+      - db
+  
+  frontend:
+    build: ./frontend
+    ports:
+      - "3001:8080"
+    depends_on:
+      - backend
+
+volumes:
+  dbdata:
