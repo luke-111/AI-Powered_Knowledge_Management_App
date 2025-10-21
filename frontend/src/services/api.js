@@ -1,12 +1,8 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: 'http://localhost:3000/api',
+  headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.response.use(
@@ -17,11 +13,13 @@ api.interceptors.response.use(
   }
 );
 
+const withCredentials = { withCredentials: true };
+
 export const sessionsAPI = {
-  login: (data) => api.post('/sessions/login', data, { withCredentials: true }),
-  logout: () => api.post('/sessions/logout', {}, { withCredentials: true }),
-  refresh: () => api.post('/sessions/refresh', {}, { withCredentials: true }),
-}
+  login: (data) => api.post('/sessions/login', data, withCredentials),
+  logout: () => api.post('/sessions/logout', {}, withCredentials),
+  refresh: () => api.post('/sessions/refresh', {}, withCredentials),
+};
 
 export const notesAPI = {
   getAll: (params = {}) => api.get('/notes', { params }),
@@ -29,6 +27,8 @@ export const notesAPI = {
   create: (data) => api.post('/notes', data),
   update: (id, data) => api.patch(`/notes/${id}`, data),
   delete: (id) => api.delete(`/notes/${id}`),
+  semanticSearch: (query) => api.post('/notes/search', { query }),
+  summarize: (id) => api.post(`/notes/${id}/summarize`),
 };
 
 export const categoriesAPI = {

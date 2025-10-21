@@ -1,41 +1,70 @@
-const FilterBar = ({ categories, filters, onFilterChange }) => {
+const FilterBar = ({ categories, filters, onFilterChange, searchQuery = '', onSearchChange = () => {}, isSearching = false, searchError = '' }) => {
   const handleFilterChange = (filterType, value) => {
     onFilterChange({ [filterType]: value });
   };
 
+  const handleClear = () => {
+    onFilterChange({ category: '', archived: '' });
+    if (searchQuery) {
+      onSearchChange('');
+    }
+  };
+
   return (
-    <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-6 mb-6">
-      <h3 className="font-semibold text-lg text-gray-900 mb-4">Filters</h3>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-          <select
-            value={filters.category}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-          >
-            <option value="">All categories</option>
-            <option value="-1">No category</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))}
-          </select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <select
-            value={filters.archived}
-            onChange={(e) => handleFilterChange('archived', e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-          >
-            <option value="">All notes</option>
-            <option value="false">Active</option>
-            <option value="true">Archived</option>
-          </select>
+    <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-6 mb-6 space-y-6">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Semantic Search</label>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder={'Ask anything, e.g. "strategies to improve onboarding"'}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+        />
+        {isSearching ? (
+          <p className="text-xs text-blue-600 mt-2">Generating semantic matches…</p>
+        ) : searchError ? (
+          <p className="text-xs text-red-600 mt-2">{searchError}</p>
+        ) : searchQuery ? (
+          <p className="text-xs text-gray-500 mt-2">Clear filters to reset both filters and search.</p>
+        ) : (
+          <p className="text-xs text-gray-500 mt-2">Type a natural language question to discover related entries instantly.</p>
+        )}
+      </div>
+
+      <div>
+        <h3 className="font-semibold text-lg text-gray-900 mb-4">Filters</h3>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+            <select
+              value={filters.category}
+              onChange={(e) => handleFilterChange('category', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="">All categories</option>
+              <option value="-1">No category</option>
+              {categories.map(category => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+            <select
+              value={filters.archived}
+              onChange={(e) => handleFilterChange('archived', e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
+              <option value="">All entries</option>
+              <option value="false">Active</option>
+              <option value="true">Archived</option>
+            </select>
+          </div>
         </div>
       </div>
       
@@ -56,7 +85,7 @@ const FilterBar = ({ categories, filters, onFilterChange }) => {
             )}
           </div>
           <button
-            onClick={() => onFilterChange({ category: '', archived: '' })}
+            onClick={handleClear}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium underline"
           >
             Clear filters

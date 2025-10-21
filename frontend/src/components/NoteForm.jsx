@@ -101,7 +101,7 @@ const NoteForm = ({ note, categories, onSubmit, onCancel }) => {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">
-            {note ? 'Edit Note' : 'New Note'}
+            {note ? 'Edit Entry' : 'New Entry'}
           </h2>
           <button
             onClick={onCancel}
@@ -165,7 +165,7 @@ const NoteForm = ({ note, categories, onSubmit, onCancel }) => {
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.title ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Note title"
+              placeholder="Entry title"
             />
             {errors.title && (
               <p className="mt-2 text-sm text-red-600">{errors.title}</p>
@@ -187,7 +187,7 @@ const NoteForm = ({ note, categories, onSubmit, onCancel }) => {
               className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none ${
                 errors.content ? 'border-red-500' : 'border-gray-300'
               }`}
-              placeholder="Note content"
+              placeholder="Entry content"
             />
             {errors.content && (
               <p className="mt-2 text-sm text-red-600">{errors.content}</p>
@@ -226,7 +226,7 @@ const NoteForm = ({ note, categories, onSubmit, onCancel }) => {
               type="submit"
               className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-200"
             >
-              {note ? 'Update' : 'Create'}
+              {note ? 'Update Entry' : 'Create Entry'}
             </button>
           </div>
         </form>

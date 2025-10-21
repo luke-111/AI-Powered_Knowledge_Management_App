@@ -23,6 +23,10 @@ export const Note = sequelize.define('Note', {
             key: 'id'
         }
     },
+    embedding: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
     archived: {
         type: DataTypes.BOOLEAN,
         defaultValue: false

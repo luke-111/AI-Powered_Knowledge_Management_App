@@ -19,6 +19,8 @@ services:
       DB_NAME: notes
       PRIVATE_KEY: thisIsASecretKey
       GOOGLE_API_KEY: ${GOOGLE_API_KEY}
+      GOOGLE_COMPLETION_MODEL: ${GOOGLE_COMPLETION_MODEL:-gemini-flash-latest}
+      GOOGLE_EMBEDDING_MODEL: ${GOOGLE_EMBEDDING_MODEL:-text-embedding-004}
     depends_on:
       - db
   

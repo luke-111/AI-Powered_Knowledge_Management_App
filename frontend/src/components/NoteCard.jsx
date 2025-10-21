@@ -1,16 +1,29 @@
 import { useState } from 'react';
 
-const NoteCard = ({ note, onEdit, onDelete, onToggleArchive }) => {
+const NoteCard = ({ note, onEdit, onDelete, onToggleArchive, onSummarize }) => {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSummarizing, setIsSummarizing] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       await onDelete(note.id);
     } catch (error) {
-      console.error('Error deleting note:', error);
+      console.error('Error deleting entry:', error);
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleSummarize = async () => {
+    if (!onSummarize) return;
+    setIsSummarizing(true);
+    try {
+      await onSummarize(note);
+    } catch (error) {
+      console.error('Error summarizing entry:', error);
+    } finally {
+      setIsSummarizing(false);
     }
   };
 
@@ -27,7 +40,14 @@ const NoteCard = ({ note, onEdit, onDelete, onToggleArchive }) => {
       note.archived ? 'opacity-70 bg-gray-50' : 'card-shadow'
     }`}>
       <div className="flex justify-between items-start mb-4">
-        <h3 className="font-bold text-xl text-gray-900 pr-4">{note.title}</h3>
+        <div className="flex flex-col gap-1 pr-4">
+          <h3 className="font-bold text-xl text-gray-900">{note.title}</h3>
+          {typeof note.similarityScore === 'number' && (
+            <span className="inline-flex items-center text-xs font-semibold text-blue-700 bg-blue-100 px-2 py-1 rounded-full">
+              Relevance {Math.round(note.similarityScore * 100)}%
+            </span>
+          )}
+        </div>
         <div className="flex gap-2 flex-shrink-0">
           <button
             onClick={() => onEdit(note)}
@@ -40,6 +60,13 @@ const NoteCard = ({ note, onEdit, onDelete, onToggleArchive }) => {
             className="px-3 py-2 text-sm bg-gray-50 text-gray-700 rounded-lg font-medium hover:bg-gray-100 transition-colors"
           >
             {note.archived ? 'Activate' : 'Archive'}
+          </button>
+          <button
+            onClick={handleSummarize}
+            disabled={isSummarizing}
+            className="px-3 py-2 text-sm bg-purple-50 text-purple-700 rounded-lg font-medium hover:bg-purple-100 transition-colors disabled:opacity-50"
+          >
+            {isSummarizing ? '...' : 'Summarize'}
           </button>
           <button
             onClick={handleDelete}

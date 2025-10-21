@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
-  title: Notes web app API
-  description: REST API for the management of notes and categories.
+  title: AI-Powered Knowledge Management API
+  description: REST API for managing AI-assisted knowledge entries and categories.
   version: 1.0.0
 servers:
   - url: http://localhost:3000
@@ -20,22 +20,22 @@ paths:
     get:
       security:
         - bearerAuth: []
-      summary: Get all notes
-      description: Returns a list of notes. You can filter by archived status and category.
+      summary: Get all knowledge entries
+      description: Returns a list of knowledge entries. You can filter by archived status and category.
       parameters:
         - in: query
           name: archived
           schema:
             type: boolean
-          description: Filter notes by archived status (true/false)
+          description: Filter entries by archived status (true/false)
         - in: query
           name: category
           schema:
             type: integer
-          description: Filter notes by category ID. Use -1 to filter by no category or leave empty to get all notes.
+          description: Filter entries by category ID. Use -1 to filter by no category or leave empty to get all entries.
       responses:
         200:
-          description: List of notes
+          description: List of knowledge entries
           content:
             application/json:
               schema:
@@ -56,7 +56,7 @@ paths:
     post:
       security:
         - bearerAuth: []
-      summary: Create a new note
+      summary: Create a new knowledge entry
       requestBody:
         required: true
         content:
@@ -65,13 +65,13 @@ paths:
               $ref: '#/components/schemas/NoteInput'
       responses:
         201:
-          description: Note created
+          description: Knowledge entry created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
         400:
-          description: Invalid data for creating note
+          description: Invalid data for creating a knowledge entry
           content:
             application/json:
               schema:
@@ -86,7 +86,7 @@ paths:
     delete:
       security:
         - bearerAuth: []
-      summary: Delete a note
+      summary: Delete a knowledge entry
       parameters:
         - in: path
           name: id
@@ -95,19 +95,19 @@ paths:
             type: integer
       responses:
         200:
-          description: Note deleted
+          description: Knowledge entry deleted
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
         400:
-          description: ID is required to delete note
+          description: ID is required to delete a knowledge entry
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Note not found
+          description: Knowledge entry not found
           content:
             application/json:
               schema:
@@ -121,7 +121,7 @@ paths:
     patch:
       security:
         - bearerAuth: []
-      summary: Update a note
+      summary: Update a knowledge entry
       parameters:
         - in: path
           name: id
@@ -136,19 +136,107 @@ paths:
               $ref: '#/components/schemas/NoteUpdateInput'
       responses:
         200:
-          description: Note updated
+          description: Knowledge entry updated
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Note'
         400:
-          description: Invalid data for updating note or ID is required
+          description: Invalid data for updating a knowledge entry or ID is required
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
         404:
-          description: Note not found
+          description: Knowledge entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/notes/search:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Run semantic search across knowledge entries
+      description: Returns up to 10 knowledge entries ranked by cosine similarity to the provided query.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: Natural language prompt to search for semantically related entries.
+              required:
+                - query
+      responses:
+        200:
+          description: Ranked knowledge entries matching the semantic query
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  payload:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Note'
+        400:
+          description: Invalid search request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /api/notes/{id}/summarize:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Summarize a knowledge entry
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Concise summary generated by Google Generative AI
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  payload:
+                    type: object
+                    properties:
+                      summary:
+                        type: string
+        400:
+          description: Missing required data to summarize
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Knowledge entry not found
           content:
             application/json:
               schema:
@@ -452,6 +540,11 @@ components:
           nullable: true
         Category:
           $ref: '#/components/schemas/Category'
+        similarityScore:
+          type: number
+          format: float
+          nullable: true
+          description: Cosine similarity score returned by semantic search queries.
     NoteInput:
       type: object
       properties:
