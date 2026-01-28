@@ -1,11 +1,16 @@
-FROM node:alpine
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY . .
+COPY requirements.txt ./
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-RUN npm install -g wait-port && npm install
+COPY app ./app
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "wait-port db:5432 && npm start"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "3000"]
